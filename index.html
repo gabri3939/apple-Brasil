@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple (Brasil)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #333;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        header img {
+            height: 40px;
+        }
+        nav {
+            flex-grow: 1;
+            position: relative;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav ul li {
+            position: relative;
+            margin: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1em;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #0071e3;
+            transform: scale(1.05);
+        }
+        nav ul li:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        .tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+            width: max-content;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .nav-search,
+        .shopping-cart,
+        .user-area {
+            position: relative;
+            margin-left: 20px;
+        }
+        .nav-search img,
+        .shopping-cart img,
+        .user-area img {
+            height: 20px;
+        }
+        .search-tooltip {
+            display: none;
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .nav-search:hover .search-tooltip {
+            display: block;
+        }
+        .cart-tooltip {
+            display: none;
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .cart-tooltip a {
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            padding: 8px;
+            border-bottom: 1px solid #555;
+        }
+        .cart-tooltip a:last-child {
+            border-bottom: none;
+        }
+        .shopping-cart:hover .cart-tooltip {
+            display: block;
+        }
+        .user-tooltip {
+            display: none;
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+        }
+        .user-tooltip a,
+        .user-tooltip button {
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            padding: 8px;
+            border-bottom: 1px solid #555;
+        }
+        .user-tooltip a:last-child,
+        .user-tooltip button:last-child {
+            border-bottom: none;
+        }
+        .user-tooltip button {
+            background-color: #0071e3;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .user-tooltip button:hover {
+            background-color: #005bb5;
+        }
+        .user-area:hover .user-tooltip,
+        .user-area.active .user-tooltip {
+            display: block;
+        }
+        .product-section {
+            text-align: center;
+            padding: 70px 20px;
+            position: relative;
+        }
+        .product-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .product-section p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .product-section img {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            margin-bottom: 60px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .product-section .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            z-index: 1;
+        }
+        .product-section .buttons a {
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 1em;
+            background-color: #0071e3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .product-section .buttons a.buy {
+            background-color: #1d1d1f;
+        }
+        .product-section .buttons a:hover {
+            background-color: #005bb5;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .product-section.second {
+            background-color: #000;
+            color: #fff;
+        }
+        footer {
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .highlight-section {
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .highlight-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .highlight-section p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .highlight-section img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .contact-section {
+            padding: 40px 20px;
+            background-color: #0071e3;
+            color: #fff;
+            text-align: center;
+        }
+        .contact-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .contact-section p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .contact-section a {
+            color: #fff;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        .contact-section a:hover {
+            color: #e5e5e5;
+        }
+        @media (max-width: 768px) {
+            .product-section h1 {
+                font-size: 2em;
+            }
+            .product-section p {
+                font-size: 1em;
+            }
+            .product-section .buttons {
+                flex-direction: column;
+            }
+            .product-section .buttons a {
+                width: 100%;
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            nav ul li {
+                margin: 5px 0;
+            }
+            .tooltip {
+                top: 120%;
+                width: auto;
+            }
+        }
+
+        /* Estilos do Modal de Busca */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .modal-content input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        .modal-content button {
+            background-color: #0071e3;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+            max-width: 200px;
+            transition: background-color 0.3s;
+        }
+        .modal-content button:hover {
+            background-color: #005bb5;
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .modal-close:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple Logo">
+        <nav>
+            <ul>
+                <li><a href="#">Loja</a><div class="tooltip">Encontre os melhores produtos da Apple.</div></li>
+                <li><a href="#">Mac</a><div class="tooltip">Explore a linha de computadores Mac.</div></li>
+                <li><a href="#">iPad</a><div class="tooltip">Descubra os novos iPads.</div></li>
+                <li><a href="#">iPhone</a><div class="tooltip">Confira os últimos lançamentos do iPhone.</div></li>
+                <li><a href="#">Watch</a><div class="tooltip">Veja a nova linha do Apple Watch.</div></li>
+                <li><a href="#">AirPods</a><div class="tooltip">Ouça com os novos AirPods.</div></li>
+                <li><a href="#">TV e Casa</a><div class="tooltip">Acessórios para sua casa e entretenimento.</div></li>
+                <li><a href="#">Entretenimento</a><div class="tooltip">Assine e aproveite o melhor do entretenimento.</div></li>
+                <li><a href="#">Acessórios</a><div class="tooltip">Acessórios para todos os seus produtos Apple.</div></li>
+            </ul>
+        </nav>
+        <div class="nav-search" id="search-button">
+            <a href="#"><img src="https://icones.pro/wp-content/uploads/2021/06/icone-loupe-gris.png" alt="Lupa"></a>
+        </div>
+        <div class="user-area">
+            <a href="#" id="user-button"><img src="https://alarmes24.pt/wp-content/themes/creativeminds/img/icone11.png" alt="Área do Cliente"></a>
+            <div class="user-tooltip">
+                <a href="cadastro.html">Cadastre-se</a>
+                
+                <a href="login.html">Entrar</a>
+                <button id="client-area-button">Área do Cliente</button>
+            </div>
+        </div>
+        <div class="shopping-cart">
+            <a href="#" id="cart-button"><img src="https://cdn-icons-png.flaticon.com/512/40/40368.png" alt="Compras"></a>
+            <div class="cart-tooltip">
+                <a href="pedido.html">Meu Pedido</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal de Busca -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <input type="text" placeholder="Digite sua busca...">
+            <button>Buscar</button>
+        </div>
+    </div>
+
+    <div class="product-section">
+        <h1>MacBook Air</h1>
+        <p>Superfino. Superleve. Superchip M3.</p>
+        <div class="buttons">
+            <a href="#" class="learn-more">Saiba mais</a>
+            <a href="#" class="buy">Comprar</a>
+        </div>
+        <img src="https://m.media-amazon.com/images/I/61Y30DpqRVL._AC_UF1000,1000_QL80_.jpg" alt="MacBook Air">
+    </div>
+
+    <div class="highlight-section">
+        <h2>Novidades e Ofertas</h2>
+        <p>Confira nossas últimas novidades e ofertas especiais. Não perca!</p>
+        <img src="https://www.mundoconectado.com.br/wp-content/uploads/2023/11/23_11_17_075935-912x569.jpg" alt="Novidades">
+    </div>
+
+    <div class="product-section second">
+        <h1>iPhone 15 Pro</h1>
+        <p>Titânio. Muito robusto. Muito leve. Muito Pro.</p>
+        <div class="buttons">
+            <a href="#" class="learn-more">Saiba mais</a>
+            <a href="#" class="buy">Comprar</a>
+        </div>
+        <img src="https://rphonequality.ro/wp-content/uploads/2023/09/res_c604fe991d63a90d06892245970ba56e-1.jpg" alt="iPhone 15 Pro">
+    </div>
+
+    <div class="contact-section">
+        <h2>Entre em Contato</h2>
+        <p>Tem alguma dúvida ou precisa de ajuda? Entre em contato conosco!</p>
+        <p>Email: <a href="mailto:contato@apple.com">contato@apple.com</a></p>
+        <p>Telefone: <a href="tel:+551112345678">+55 11 1234-5678</a></p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Apple Inc. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.querySelector('.user-area a').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.user-area').classList.toggle('active');
+        });
+
+        document.querySelector('#client-area-button').addEventListener('click', function() {
+            window.location.href = 'cliente.html'; // URL para a Área do Cliente
+        });
+
+        document.querySelector('#cart-button').addEventListener('click', function() {
+            window.location.href = 'pedido.html'; // URL para a página de pedido
+        });
+
+        // Abrir o modal de busca
+        document.querySelector('#search-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('#search-modal').style.display = 'flex';
+        });
+
+        // Fechar o modal de busca
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            document.querySelector('#search-modal').style.display = 'none';
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!document.querySelector('.user-area').contains(e.target)) {
+                document.querySelector('.user-area').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
